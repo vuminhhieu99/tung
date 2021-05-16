@@ -1,0 +1,40 @@
+﻿@using ShopWatch.Model
+@model List<Watch>
+@{
+	var date = DateTime.Now;
+	var listwatch = Model.Where(s => s.Promotions.
+	Where(a => (a.StartDate <= DateTime.Now && a.EndDate >= DateTime.Now)).Count() > 0);
+}
+@{
+	ViewBag.Title = "Index";
+	Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@Html.Partial("_Carousel")
+
+<h3 class="pt-2">Sản phẩm nổi bật</h3>
+<hr />
+
+<div class="row">
+	@foreach (var watch in Model)
+	{
+		@Html.Partial("_WatchOverview", watch)
+	}
+</div>
+
+<h3 class="pt-2">Sản phẩm khuyến mãi</h3>
+<hr />
+<div class="row">
+	@if (listwatch.Count()==0)
+	{
+		<h4 class="text-warning p-4">Chưa có sản phẩm khuyến mãi</h4>
+	}
+	@foreach (var watch in listwatch)
+	{
+		@Html.Partial("_WatchOverview", watch)
+	}
+</div>
+
+
+
+
