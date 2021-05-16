@@ -4,8 +4,10 @@ using ShopWatch.Model.DataContext;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Web;
 using System.Web.Mvc;
+using ShopWatch.Model;
 
 namespace ShopWatch.WebMvc.Controllers
 {
@@ -18,17 +20,21 @@ namespace ShopWatch.WebMvc.Controllers
 		{
 			_watchServices = watchServices;
 		}
-		public ActionResult Index(string search)
+		public ActionResult Index(string search, int? page)
 		{
-		
+			Func<IQueryable<Watch>, IOrderedQueryable<Watch>> orderBy = null;
+			orderBy = b => b.OrderBy(s => s.Quantity);
 			if (search==null || search=="")
 			{
-				var watches = _watchServices.GetAll().ToList();
+				var watches = _watchServices.GetAsync(orderBy: orderBy,page: page ?? 1, pageSize: 10);
+				page = 1;
 				return View(watches);
 			}
 			else
 			{
-				var watches = _context.Watches.Where(s => s.WatchName.Contains(search)).ToList();
+				Expression<Func<Watch, bool>> filter = null;
+				filter = a => a.WatchName.Contains(search);
+				var watches = _watchServices.GetAsync(filter: filter, orderBy: orderBy, page: page ?? 1, pageSize: 10);
 				return View(watches);
 				
 			}	
